@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol ColorPickerFooterViewDelegate: AnyObject {
+    func colorPickerFooterView(_ picker: ColorPickerFooterView, didSelect color: UIColor)
+}
+
 class ColorPickerFooterView: UIView {
     
     // MARK: -
@@ -16,11 +20,10 @@ class ColorPickerFooterView: UIView {
     private(set) var titleLabel: UILabel!
     
     private(set) var collectionView: UICollectionView!
-    private(set) var colors: [UIColor] = [
+    static var defaultColors: [UIColor] = [
         .red,
         .blue,
         .yellow,
-        .white,
         .purple,
         .orange,
         .cyan,
@@ -32,30 +35,40 @@ class ColorPickerFooterView: UIView {
         .gray,
         .lightGray,
     ]
+    private(set) var colors = [UIColor]()
+    
+    private weak var delegate: ColorPickerFooterViewDelegate?
     
     // MARK: -
     // MARK: Functions
     
-    init() {
-        super.init(frame: .zero)
-        setup()
-    }
+    private init() { super.init(frame: .zero) }
     
-    convenience init(title: String?, colors: [UIColor]) {
+    convenience init(title: String?,
+                     colors: [UIColor] = ColorPickerFooterView.defaultColors,
+                     delegate: ColorPickerFooterViewDelegate) {
         self.init()
         
+        self.title = title
+        self.delegate = delegate
         self.colors = colors
+        
+        setup()
+        
         self.collectionView.reloadData()
     }
     
     private func setup() {
+        if colors.isEmpty {
+            colors = ColorPickerFooterView.defaultColors
+        }
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 8
         layout.minimumInteritemSpacing = 8
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .lightGray
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.showsVerticalScrollIndicator = false
@@ -108,7 +121,21 @@ class ColorPickerFooterView: UIView {
 
 extension ColorPickerFooterView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCell else {
+            return
+        }
         
+        cell.isSelected = true
+        let color = colors[indexPath.item]
+        delegate?.colorPickerFooterView(self, didSelect: color)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCell else {
+            return
+        }
+        
+        cell.isSelected = false
     }
 }
 

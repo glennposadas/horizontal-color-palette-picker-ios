@@ -16,6 +16,14 @@ class ColorCell: UICollectionViewCell {
     private(set) var colorView: UIView!
     private(set) var checkmarkImageView: UIImageView!
     
+    override var isSelected: Bool {
+        didSet {
+            UIView.animate(withDuration: 0.1, animations: {
+                self.checkmarkImageView.alpha = self.isSelected ? 1.0 : 0
+            }, completion: nil)
+        }
+    }
+    
     // MARK: -
     // MARK: Functions
     
@@ -50,7 +58,13 @@ class ColorCell: UICollectionViewCell {
             colorView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
         
-        checkmarkImageView = UIImageView(image: UIImage(named: ""))
+        checkmarkImageView = UIImageView(image: UIImage(named: "ic_checkmark_white"))
+        checkmarkImageView.alpha = 0
+        checkmarkImageView.layer.shadowColor = UIColor.black.cgColor
+        checkmarkImageView.layer.shadowOffset = .init(width: 0, height: 1)
+        checkmarkImageView.layer.shadowOpacity = 0.8
+        checkmarkImageView.layer.shadowRadius = 0.3
+        checkmarkImageView.clipsToBounds = false
         contentView.addSubview(checkmarkImageView)
         checkmarkImageView.translatesAutoresizingMaskIntoConstraints = false
         

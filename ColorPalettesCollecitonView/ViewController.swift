@@ -24,7 +24,8 @@ class ViewController: UIViewController {
     }
 
     private func setupPicker() {
-        picker = ColorPickerFooterView()
+        picker = ColorPickerFooterView(title: "Background Color", delegate: self)
+        picker.backgroundColor = .lightGray
         picker.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(picker)
         
@@ -34,5 +35,14 @@ class ViewController: UIViewController {
             picker.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             picker.heightAnchor.constraint(equalToConstant: 100)
         ])
+    }
+}
+
+// MARK: -
+// MARK: ColorPickerFooterViewDelegate
+
+extension ViewController: ColorPickerFooterViewDelegate {
+    func colorPickerFooterView(_ picker: ColorPickerFooterView, didSelect color: UIColor) {
+        view.backgroundColor = color
     }
 }
